@@ -1,2 +1,4 @@
+node_modules/
 .env
-node_module
+dist/
+build/
