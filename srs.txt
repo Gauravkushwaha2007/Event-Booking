@@ -121,3 +121,28 @@ Development will be done step-by-step:
 `Setup → Authentication → Events → Booking → Admin → Frontend → Payment → Testing`
 
 New requirements or necessary changes discovered during development will be added to the SRS.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    const { name, email, password } = req.body;
+    try{
+        const user = new User(name, email, password);
+        res.status(201).json({message: 'User Created SuccessFully'});
+        user.save();
+    }
+    catch(e){
+        console.log(e,'While register user (AuthController.js)');
+    }
