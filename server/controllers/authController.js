@@ -17,6 +17,9 @@ const registerUser = async (req, res, next )=>{
             });
         await user.save();
         res.status(201).json({message: 'User Created'});
+
+        const OTP = Math.floor(100000 + Math.random() * 900000).toString();
+        
     }
     catch (e) {
         res.status(400).json({error: e.message})
