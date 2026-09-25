@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs')
 
 const registerUser = async (req, res, next )=>{
     const {name, email, password} = req.body;
-    let existUser = User.findOne({email});
+    let existUser = await User.findOne({email});
     if(existUser){
         res.status(400).json({error: 'User Already exist'})
     }
@@ -16,7 +16,7 @@ const registerUser = async (req, res, next )=>{
               password: hashPassword
             });
         await user.save();
-        res.status(201).json({message: 'User Created'});
+        res.status(201).json({message: 'User Registered'});
 
         const OTP = Math.floor(100000 + Math.random() * 900000).toString();
         

@@ -14,7 +14,7 @@ const OTP = new mongoose.Schema({
     },
     action: {
         type: String,
-        enum: ['Account_verificaiton', 'Event_Booking'],
+        enum: ['Account_verification', 'Event_Booking'],
         required: true
     },
     createdAt: {
