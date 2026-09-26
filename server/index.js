@@ -6,12 +6,19 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 
-const authRoutes = require('./routes/auth');
+const authRoutes = require('./routes/authRoutes');
+const eventRoutes = require('./routes/eventRoutes');
+const bookingRoutes = require('./routes/bookingRoutes');
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+
+app.use('api/auth', authRoutes);
+app.use('api/events', eventRoutes);
+app.use('api/bookings', bookingRoutes)
 
 async function connectToDB() {
     try {
@@ -21,7 +28,6 @@ async function connectToDB() {
         console.log('Error while connecting to DB:', error);
     }
 }
-
 connectToDB();
 
 app.get('/', (req, res) => {
