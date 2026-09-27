@@ -25,4 +25,32 @@ exports.getEventById = async (req, res) =>{
     }
 }
 
+exports.createEvent = async (req, res) =>{
+
+    try{
+        const eventBody =  {title, description, date, category, totalSeat, availableSeat, ticketPrice, location, imageUrl, eventType} = req.body;
+        const event = await Event.create(eventBody);
+        res.status(201).json(event);
+
+    }
+    catch (e){
+        res.status(500).json({error: e.message})
+    }
+}
+
+
+exports.updateEvent = async (req, res) =>{
+    const eventData = {title, description, date, category, totalSeat, availableSeat, ticketPrice, location, imageUrl, eventType} = req.body;
+
+    try{
+        let event = await Event.findByIdAndUpdate(req.params._id, eventData);
+        if(!event) {
+            res.status(404).json({error: 'Event not found'})
+        }
+        res.json(event);
+    }
+    catch (e) {
+        res.status(500).json({error: e.message});
+    }
+}
 
