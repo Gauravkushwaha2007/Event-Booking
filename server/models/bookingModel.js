@@ -20,7 +20,7 @@ const bookingSchema = new mongoose.Schema({
         enum: ['paid', 'not_paid'],
         default: 'not_paid',
     },
-    ammount: {
+    amount: {
         type: Number,
         required: true
     }
