@@ -1,13 +1,60 @@
 const Booking = require('../models/bookingModel');
+const Event = require('../models/eventModel');
+const Otp = require('../models/otpModel');
+const User = require('../models/userModel');
+const {sendOtpEmail} = require('../utils/email')
 
 
-const bookEvent = async (req, res) =>{
-    try{
-        const 
-        const booking = Booking.create({
-            event,
-            user: req.user._id,
-            
-        })
-    }
+const generateOTP = () =>{
+    return Math.floor(100000 + Math.random() * 900000).toString();
 }
+
+exports.sendBookingOTP = async (req, res, next) =>{
+    const otp = generateOTP();
+    await Otp.findOneAndDelete({email: req.user.email, action: 'Event_Booking'});
+    const OTP = Otp.create({
+        email: req.user.email,
+        otp, 
+        action: 'Event_Booking'
+    });
+    await sendOtpEmail(req.user.email, otp, 'Event_Booking');
+    res.json({message: 'Booking Otp sent to your gamil'});
+
+}
+
+exports.bookEvent = async (req, res, next) =>{
+    const {eventId, otp } = req.body;
+
+    const otpRecord = await Otp.findOne({email: req.user.email, otp, action: 'Event_Booking'});
+    if(!otpRecord) {
+        return res.status(400).json({error: 'Invalid Otp'});
+    }
+
+    const event = await Event.findById({eventId});
+    if(!event) {
+        return res.status(404).json({error: 'Event not found'});
+    }
+
+    if (Event.availableSeats <= 0) {
+        return res.status(400).json({message: 'Sorry, No Seats available'});
+    }
+
+    const existingBooking = await Booking.findOne({event: eventId, user: req.user._id});
+    if(existingBooking) {
+        return res.status(400).json({message: 'Already booked for this event'});
+    }
+
+
+    await Booking.create({
+        event: eventId,
+        user: req.user._id,
+        status: 'pending',
+        paymentStatus: 'not_paid',
+        amount: Event.ticketPrice
+    });
+
+    Event.availableSeats--;
+    await Otp.deleteMany({email: req.user.email, action: 'Event_Booking'});
+    return res.status(201).json({message: 'Booked created, Please check your email'})
+}
+
