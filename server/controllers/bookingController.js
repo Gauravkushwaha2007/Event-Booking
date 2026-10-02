@@ -58,3 +58,23 @@ exports.bookEvent = async (req, res, next) =>{
     return res.status(201).json({message: 'Booked created, Please check your email'})
 }
 
+
+exports.confirmBooking = async (req, res, next) =>{
+    const event = Event.findById(req.param._id)
+}
+
+
+exports.getMyBookings = async (req, res, next ) =>{
+    const bookings = await Booking.find({userId: req.user._id}).populate('eventId');
+    res.json(bookings);
+}
+
+
+exports.cancelBooking = async (req, res, next) =>{
+    const booking = await Booking.findById(req.params._id).populate('eventId');
+    if(!booking) {
+        return res.status(404).json({error: 'Booking not found'});
+    }
+
+    
+}
