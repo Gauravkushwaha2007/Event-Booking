@@ -12,7 +12,7 @@ const generateOTP = () =>{
 exports.sendBookingOTP = async (req, res, next) =>{
     const otp = generateOTP();
     await Otp.findOneAndDelete({email: req.user.email, action: 'Event_Booking'});
-    const OTP = Otp.create({
+    await Otp.create({
         email: req.user.email,
         otp, 
         action: 'Event_Booking'
@@ -30,12 +30,12 @@ exports.bookEvent = async (req, res, next) =>{
         return res.status(400).json({error: 'Invalid Otp'});
     }
 
-    const event = await Event.findById({eventId});
+    const event = await Event.findById(eventId);
     if(!event) {
         return res.status(404).json({error: 'Event not found'});
     }
 
-    if (Event.availableSeats <= 0) {
+    if (event.availableSeats <= 0) {
         return res.status(400).json({message: 'Sorry, No Seats available'});
     }
 
@@ -50,25 +50,26 @@ exports.bookEvent = async (req, res, next) =>{
         user: req.user._id,
         status: 'pending',
         paymentStatus: 'not_paid',
-        amount: Event.ticketPrice
+        amount: event.ticketPrice
     });
 
-    Event.availableSeats--;
+    event.availableSeats--;
+    await event.save();
     await Otp.deleteMany({email: req.user.email, action: 'Event_Booking'});
     return res.status(201).json({message: 'Booked created, Please check your email'})
+}
+
+
+
+exports.getMyBookings = async (req, res, next ) =>{
+    const bookings = await Booking.find({user: req.user._id}).populate('event');
+    res.json(bookings);
 }
 
 
 exports.confirmBooking = async (req, res, next) =>{
     const event = Event.findById(req.param._id)
 }
-
-
-exports.getMyBookings = async (req, res, next ) =>{
-    const bookings = await Booking.find({userId: req.user._id}).populate('eventId');
-    res.json(bookings);
-}
-
 
 exports.cancelBooking = async (req, res, next) =>{
     const booking = await Booking.findById(req.params._id).populate('eventId');
