@@ -1,7 +1,8 @@
 const Booking = require('../models/bookingModel');
 const Event = require('../models/eventModel');
 const Otp = require('../models/otpModel');
-const { sendOtpEmail, sendBookingEmail } = require('../utils/email');
+const User = require('../models/userModel');
+const {sendOtpEmail} = require('../utils/email')
 
 
 const generateOTP = () => {
@@ -101,45 +102,26 @@ exports.getMyBookings = async (req, res, next) => {
 };
 
 
-exports.confirmBooking = async (req, res, next) => {
-    const { paymentStatus } = req.body;
+exports.confirmBooking = async (req, res, next) =>{
+    const event = Event.findById(req.param._id)
+}
 
-    const booking = await Booking.findById(req.params.id).populate('event');
-
-    if (!booking) {
-        return res.status(404).json({ error: 'Booking not found' });
+exports.cancelBooking = async (req, res, next) =>{
+    const booking = await Booking.findById(req.params._id).populate('eventId');
+    if(!booking) {
+        return res.status(404).json({error: 'Booking not found'});
     }
 
-    if (booking.status === 'confirmed') {
-        return res.status(400).json({ message: 'Booking already confirmed' });
+    if (booking.status === 'confirmed' ) {
+        const event = await Event.findById(booking.event._id);
+        event.availableSeats += 1;
+        await event.save();
     }
 
-    // The seat was reserved when the pending booking was created,
-    // so confirmation should not decrease availableSeats again.
-    booking.status = 'confirmed';
-
-    if (paymentStatus === 'paid' || paymentStatus === 'not_paid') {
-        booking.paymentStatus = paymentStatus;
-    }
-
+    booking.status = 'cancelled';
     await booking.save();
-
-    await sendBookingEmail(
-        req.user.email,
-        req.user.name,
-        booking.event.title
-    );
-
-    res.json({ message: 'Booking confirmed successfully' });
-};
-
-
-exports.cancelBooking = async (req, res, next) => {
-    const booking = await Booking.findById(req.params.id);
-
-    if (!booking) {
-        return res.status(404).json({ error: 'Booking not found' });
-    }
+    await booking.remove();
+    res.json({message: 'Booking Cancelled'});
 
     // Both pending and confirmed bookings have already reserved a seat.
     const event = await Event.findById(booking.event);
