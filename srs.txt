@@ -1,148 +1,372 @@
-# Event Booking System – SRS v1.0
+# Event Booking System – SRS v1.1
 
 ## 1. Project Overview
 
-A basic Event Booking System where users can view and book events, while admins can create events and manage bookings.
+Event Booking System is a web-based application where users can view available events and book them, while admins can create and manage events and handle booking requests.
+
+The system will provide separate interfaces for users and admins.
+
+---
 
 ## 2. Technology Stack
 
-* **Frontend:** React + Vite, Tailwind CSS, Axios
+* **Frontend:** React + Vite
+* **Styling:** Tailwind CSS
+* **HTTP Client:** Axios
 * **Backend:** Node.js + Express.js
 * **Database:** MongoDB + Mongoose
 * **Architecture:** MVC
-* **Authentication:** JWT + role-based access
-* **Security:** Password hashing
-* **Email:** Gmail SMTP
+* **Authentication:** JWT
+* **Authorization:** Role-based access
+* **Password Security:** bcrypt
+* **Email:** Nodemailer with Gmail SMTP
 
-## 3. Roles
+---
+
+## 3. User Roles
 
 ### User
 
-* Register and verify email using OTP
+Users can:
+
+* Register an account
+* Verify email using OTP
 * Login
-* View events
-* Book events
+* View available events
+* View event details
+* Book an event
 * Verify booking using OTP
 * View booking status
-* Cancel booking
-* View bookings from dashboard
+* Cancel booking where allowed
+* View all their bookings
+* Make payment for paid events
 
 ### Admin
 
+Admins can:
+
 * Login
-* View dashboard
-* Create, edit and delete events
-* View all events and bookings
+* Access admin dashboard
+* Create events
+* Edit events
+* Delete events
+* Publish or close events
+* View all events
+* View booking requests
 * Accept or reject booking requests
-* Check paid/unpaid status
-* View basic analytics and status information
+* View booking and payment status
+* View basic analytics
 
-## 4. Main Data Flow
+---
 
-**User:**
+## 4. Main System Flow
 
-`Signup → OTP Verification → Login → Events → Booking → OTP Confirmation → Booking Status → Dashboard`
+### User Flow
 
-**Admin:**
+`Register → Email OTP → Login → Browse Events → Event Details → Book Event → Booking OTP → Pending → Admin Decision → Payment (if paid) → Confirmed → Dashboard`
 
-`Login → Dashboard → Create/Manage Events → View Bookings → Accept/Reject → Payment/Status → Analytics`
+### Admin Flow
 
-## 5. Database Models
+`Login → Admin Dashboard → Create Event → Manage Event → Publish → View Bookings → Accept/Reject → Manage Status → Analytics`
+
+---
+
+## 5. Frontend
+
+The frontend will provide separate interfaces for users and admins.
+
+### User Interface
+
+* Landing page
+* Login page
+* Registration page
+* OTP verification
+* Event listing
+* Event details
+* Booking form
+* Booking OTP verification
+* User dashboard
+* My bookings
+* Booking status
+* Payment option for paid events
+
+### Admin Interface
+
+* Admin login
+* Admin dashboard
+* Event management
+* Create event form
+* Edit event
+* Delete event
+* Booking requests
+* Accept/Reject booking
+* Booking status
+* Basic analytics
+
+---
+
+## 6. Database Models
 
 Initial models:
 
-* **User** – name, email, password, role and basic account details
-* **Event** – event details, date, price, seats and status
-* **Booking** – user, event, booking status and payment status
-* **OTP** – email, OTP, purpose and expiry
+### User
 
-More models can be added only if required later.
+Stores:
 
-## 6. Authentication
+* Name
+* Email
+* Password
+* Role
+* Email verification status
 
-* User and Admin will have role-based access.
-* Passwords will be hashed before storing.
-* JWT will be used for login authentication.
-* Protected routes will be used for authenticated users/admin.
-* OTP will be used for email verification and booking confirmation.
+### Event
 
-## 7. Event Management
+Stores:
 
-Admin can:
+* Title
+* Description
+* Date
+* Category
+* Location
+* Total seats
+* Available seats
+* Ticket price
+* Event type
+* Image
+* Status
+* Created by
+
+### Booking
+
+Stores:
+
+* User
+* Event
+* Booking status
+* Payment status
+* Amount
+* Booking details
+
+### OTP
+
+Stores:
+
+* Email
+* OTP
+* Purpose
+* Creation/expiry information
+
+Additional models will only be added if required during development.
+
+---
+
+## 7. Authentication and Authorization
+
+* Users and admins will authenticate using JWT.
+* Passwords will be hashed using bcrypt.
+* Protected routes will require authentication.
+* Admin routes will require admin role.
+* Email verification will use OTP.
+* Booking confirmation will use OTP.
+* Unauthorized users will not be allowed to access protected resources.
+
+---
+
+## 8. Event Management
+
+Admins can:
 
 * Create events
 * Edit events
 * Delete events
 * Set event price
-* Set free/paid event
-* Set seats and event status
+* Set free or paid event
+* Set total seats
+* Manage available seats
+* Publish events
+* Close events
+* Cancel events
 * View booking count
 
-Users can view available/published events and their details.
+Users can:
 
-## 8. Booking
+* View published events
+* Search/filter events
+* View event details
+* Check event availability
 
-* User selects an event and submits booking.
-* Booking OTP is verified.
-* Booking is created with **Pending** status.
-* Admin can **Accept** or **Reject** the booking.
-* User can see the current booking status.
-* User can cancel a booking where allowed.
-* Paid/unpaid status will be maintained.
+---
 
-## 9. Admin Dashboard
+## 9. Booking System
 
-Dashboard will contain:
+The booking process will work as follows:
+
+1. User selects an event.
+2. User submits booking details.
+3. Booking OTP is sent to the user's email.
+4. User verifies the OTP.
+5. Booking is created with `Pending` status.
+6. Admin reviews the booking.
+7. Admin can accept or reject the booking.
+8. If accepted:
+   * Free event → booking becomes confirmed.
+   * Paid event → user can proceed to payment.
+9. User can view the booking status from the dashboard.
+
+The system will prevent duplicate bookings for the same event.
+
+The system will also check event availability before creating a booking.
+
+---
+
+## 10. Payment
+
+Payment will be implemented for paid events.
+
+Basic flow:
+
+`Booking Accepted → Pay Now → Payment Gateway → Payment Verification → Booking Confirmed`
+
+The frontend will not directly decide whether a payment was successful. Payment status will be verified by the backend.
+
+Payment integration may be added after the core booking system is completed.
+
+---
+
+## 11. User Dashboard
+
+The user dashboard will display:
+
+* Upcoming bookings
+* Pending bookings
+* Confirmed bookings
+* Cancelled bookings
+* Event information
+* Booking status
+* Payment status
+
+Users will be able to open individual booking details.
+
+---
+
+## 12. Admin Dashboard
+
+The admin dashboard will contain:
 
 * Total events
+* Published events
 * Total bookings
 * Pending bookings
-* Accepted/rejected bookings
-* Paid/unpaid information
-* Basic analytics
-* Event and booking management
+* Accepted bookings
+* Rejected bookings
+* Confirmed bookings
+* Basic payment/revenue information
 
-## 10. Initial API Areas
+Admins will also have access to:
+
+* Event management
+* Booking management
+* Booking status
+* Basic analytics
+
+---
+
+## 13. API Areas
+
+Initial API areas:
 
 ```text
-/auth
-/events
-/bookings
-/admin/events
-/admin/bookings
-```
-
-Exact routes will be decided while implementing each module.
-
-## 11. Development Approach
-
-Development will be done step-by-step:
-
-`Setup → Authentication → Events → Booking → Admin → Frontend → Payment → Testing`
-
-New requirements or necessary changes discovered during development will be added to the SRS.
+/api/auth
+/api/events
+/api/bookings
+/api/admin/events
+/api/admin/bookings
 
 
+##  14. Project Structure
+Event-Booking/
+│
+├── client/
+│   ├── src/
+│   ├── public/
+│   ├── package.json
+│   └── ...
+│
+├── server/
+│   ├── controllers/
+│   ├── middlewares/
+│   ├── models/
+│   ├── routes/
+│   ├── utils/
+│   ├── index.js
+│   └── package.json
+│
+├── Build-Images/
+├── README.md
+└── SRS.md
+
+
+## 15. Security
+The system will implement:
+- Password hashing using bcrypt
+- JWT-based authentication
+- Role-based authorization
+- Protected API routes
+- OTP-based email verification
+- Input validation
+- Prevention of unauthorized admin access
+
+
+## 16. Development Approach
+Development will be completed step-by-step:
+Setup → Authentication → Events → Booking → Frontend → Admin Dashboard → Payment → Testing → Deployment
+Each module will be tested before moving to the next major module.
+New requirements discovered during development will be added to the SRS if necessary.
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-    const { name, email, password } = req.body;
-    try{
-        const user = new User(name, email, password);
-        res.status(201).json({message: 'User Created SuccessFully'});
-        user.save();
-    }
-    catch(e){
-        console.log(e,'While register user (AuthController.js)');
-    }
+## 17. Future Improvements
+Possible future features:
+- Digital event ticket
+- QR code on ticket
+- Event search and filters
+- Event categories
+- Pagination
+- Email notifications
+- Booking reminders
+- Waitlist system
+- Better analytics
+- Cloud image storage
+- Online payment gateway
+- Deployment and production setup
+These features are not required for the initial version and will be added only when needed.
+18. Current Project Status
+Completed
+- Project structure
+- Backend setup
+- MongoDB connection
+- Authentication foundation
+- JWT authentication
+- User model
+- OTP model
+- Event model
+- Email/OTP setup
+- Event API foundation
+- Booking API foundation
+- React + Vite setup
+- Tailwind CSS setup
+- Axios setup
+- React Router setup
+- React Icons setup
+In Progress
+- Frontend development
+- User interface
+- Authentication pages
+- Event pages
+- Booking interface
+Planned
+- Admin dashboard
+- Payment integration
+- Digital ticket
+- Testing
+- Deployment
