@@ -1,16 +1,19 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Home from './pages/Home';
+import EventDetails from './pages/EventDetails';
 
 function App() {
-  
   return (
-    <>
-      <section>
-        <div className="border-2 border-green-500 rounded-md p-4 w-1/4 bg-amber-200 m-5">
-          Hello world
-        </div>
-       
-      </section>
-    </>
-  )
+    <BrowserRouter>
+      <Navbar />
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/events/:id" element={<EventDetails />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
