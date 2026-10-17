@@ -3,11 +3,7 @@ import { CalendarDays, MapPin, ArrowUpRight } from 'lucide-react';
 
 function EventCard({ event }) {
   const eventDate = event.date
-    ? new Date(event.date)
-    : null;
-
-  const validDate =
-    eventDate && !Number.isNaN(eventDate.getTime());
+  const validDate = eventDate && !Number.isNaN(eventDate.getTime());
 
   const formattedDate = validDate
     ? eventDate.toLocaleDateString('en-IN', {
@@ -17,9 +13,7 @@ function EventCard({ event }) {
       })
     : 'Date to be announced';
 
-  const isFree =
-    event.eventType === 'free' ||
-    Number(event.ticketPrice) === 0;
+  const isFree = event.eventType === 'free' || Number(event.ticketPrice) === 0;
 
   return (
     <article className="group overflow-hidden rounded-2xl border border-gray-100 bg-white transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-violet-100/70">
@@ -28,22 +22,16 @@ function EventCard({ event }) {
         href={`/events/${event._id}`}
         className="relative block aspect-[16/10] overflow-hidden bg-violet-50"
       >
-        <img
-          src={
-            event.imageUrl ||
-            'https://placehold.co/800x500/e9e3ff/6d28d9?text=EventJi'
-          }
+        <img src={ event.imageUrl}
           alt={event.title || 'Event'}
-          loading="lazy"
-          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-        />
+          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"/>
 
         <span className="absolute left-3 top-3 rounded-lg bg-white/95 px-3 py-1.5 text-xs font-semibold text-gray-800 shadow-sm">
-          {event.category || 'Event'}
+          {event.category}
         </span>
 
         <span
-          className={`absolute right-3 top-3 rounded-lg px-3 py-1.5 text-xs font-bold ${
+          className={`absolute right-3 top-3 rounded-lg px-3 py-1.5 text-xs font-bold ${ 
             isFree
               ? 'bg-green-100 text-green-700'
               : 'bg-white/95 text-violet-700'
