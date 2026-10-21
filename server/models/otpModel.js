@@ -9,9 +9,6 @@ const OTP = new mongoose.Schema({
         type: String,
         required: true
     },
-    createdAt: {
-
-    },
     action: {
         type: String,   
         enum: ['Account_verification', 'Event_Booking'],
@@ -20,7 +17,7 @@ const OTP = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now,
-        expires: 500 
+        expires: 500
     }
 });
 

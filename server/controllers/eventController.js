@@ -1,16 +1,40 @@
 const Event = require('../models/eventModel');
 
-
-exports.getAllEvents = async (req, res, next)=>{
-    try{
-
-        const events = await Event.find();
-        res.json(events);
+exports.getAllEvents = async (req, res) => {
+  try {
+    const { search, category, location } = req.query;
+    const filter = {};
+    
+    // Search by event title or description
+    if (search) {
+      filter.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { discription: { $regex: search, $options: 'i' } },
+        { category: { $regex: search, $options: 'i' } },
+        { location: { $regex: search, $options: 'i' } },
+      ];
     }
-    catch (e) {
-        return res.json({message: 'Events Not found'});
+
+    // Filter by category
+    if (category) {
+      filter.category = { $regex: category, $options: 'i' };
     }
-}
+
+    // Filter by location
+    if (location) {
+      filter.location = { $regex: location, $options: 'i' };
+    }
+
+    const events = await Event.find(filter);
+
+    return res.json(events);
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Events fetch karne mein error aaya.',
+    });
+  }
+};
+
 
 exports.getEventById = async (req, res) =>{
     try{
