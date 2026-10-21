@@ -15,6 +15,7 @@ const categories = [
 ];
 
 function Home() {
+
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
